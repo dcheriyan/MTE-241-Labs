@@ -3,10 +3,6 @@ Reference:
 Getting Value back from void * https://stackoverflow.com/questions/3200294/how-do-i-convert-from-void-back-to-int-in-c/3200312#3200312
 */
 
-/* Todo
-	- Test on hardware
-*/
-
 #include <cmsis_os2.h>
 #include <LPC17xx.h>
 #include <stdbool.h>
@@ -186,9 +182,6 @@ __NO_RETURN void app_main(void* arguement) {
 		osDelay(500);
 	}
 }
-
-
-
 
 //Main Loop
 int main(void) {
