@@ -13,12 +13,44 @@ Getting Value back from void * https://stackoverflow.com/questions/3200294/how-d
 #define NUM_QUEUE 1
 #define MAX_MSGS 10
 
+int time_elapsed;
+int msg_sent;
+int msg_received;
+int overflows;
+int num_msg_queue;
+int loss_ratio;
+int arrival_ratio;
+int serv_rate;
+
+int osSleep;
+
+// global vars
+osMessageQueueId_t qids_a[NUM_QUEUE];	//Makes Message Queues
 
 
 //Monitor
-void Monitor()
-{
-//monitor
+void Monitor(void *arg)
+{	
+	for(;;){
+		for(int i=0; i < NUM_QUEUE ; i++)
+		{
+			//5. current number of messages in queue
+			num_msg_queue = osMessageQueueGetCount(qids_a[i]);
+			printf("5. queue = %d, %d messages in queue.\n", i, num_msg_queue);
+		}
+		
+		//6. average message loss ratio
+		loss_ratio = overflows/msg_sent;
+		printf("6. message loss ratio = %d", loss_ratio);
+		
+		//7. average message arrival rate
+		arrival_ratio = msg_sent/time_elapsed;
+		printf("6. message loss ratio = %d", arrival_ratio);
+		
+		//8. average service rate
+		serv_rate = msg_sent/osSleep;
+		printf("6. message loss ratio = %d", arrival_ratio);
+	}
 }
 
 void server(void *arg)
@@ -29,12 +61,14 @@ void server(void *arg)
 		//recast everything so the code is easier to read
 		osMessageQueueId_t *qid = ( (osMessageQueueId_t* )  arg);
 		
+		osSleep += (next_event())/(osKernelGetTickFreq()*10*(2^16));
+		
 		osDelay((next_event())/(osKernelGetTickFreq()*10*(2^16)));
 		
 		//receive message
 		int msg;
 		osMessageQueueGet( *qid,(void*) &msg, NULL, osWaitForever);
-		printf("msg = %d \n", msg);
+		//printf("msg = %d \n", msg);
 
 	}
 }
@@ -45,6 +79,8 @@ void client(void *arg) {
 		//recast everything so the code is easier to read
 		osMessageQueueId_t *qid = ( (osMessageQueueId_t* )  arg);
 		
+		osSleep += (next_event())/(osKernelGetTickFreq()*9*(2^16));
+		
 		osDelay((next_event())/(osKernelGetTickFreq()*9*(2^16)));
 		//Send The message
 		int msg = 1;
@@ -52,9 +88,6 @@ void client(void *arg) {
 
 	}
 }
-
-// global vars
-osMessageQueueId_t qids_a[NUM_QUEUE];	//Makes Message Queues
 
 //thread manager
 __NO_RETURN void app_main (void *arguement){
@@ -67,6 +100,7 @@ __NO_RETURN void app_main (void *arguement){
 		
 		osThreadNew(client, (void*) &(qids_a[i]), NULL);
 		osThreadNew(server, (void*) &(qids_a[i]), NULL);
+		osThreadNew(Monitor,(void*) &(qids_a[i]), NULL);
 
 	}
 	
@@ -74,12 +108,12 @@ __NO_RETURN void app_main (void *arguement){
 	while(true)
 	{
 		printf("app main ... \n");
-		for(int i=0; i < NUM_QUEUE ; i++)
-		{
-			uint32_t num = osMessageQueueGetCount(qids_a[i]);
-			printf("queue = %d, num_msg = %d \n", i, num);
-		}
-		osDelay(50);
+//		for(int i=0; i < NUM_QUEUE ; i++)
+//		{
+//			uint32_t num = osMessageQueueGetCount(qids_a[i]);
+//			printf("queue = %d, num_msg = %d \n", i, num);
+//		}
+		osDelay(500);
 	}
 }
 
