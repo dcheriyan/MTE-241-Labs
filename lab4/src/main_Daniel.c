@@ -51,10 +51,6 @@ void Monitor(void *arg)
 
 		for(int i=0; i < NUM_QUEUE ; i++)
 		{
-			e_pblk = (loss_ratio[i] - pblk_true)/pblk_true;
-			e_arrv = (arrival_ratio[i] - arrv_true)/arrv_true;
-			e_serv = (serv_rate[i] - serv_true)/serv_true;
-
 			//5. current number of messages in queue
 			num_msg_queue[i] = osMessageQueueGetCount(qids_a[i]);
 			printf("5. queue = %d, %f messages in queue.\n", i, num_msg_queue[i]);
@@ -70,6 +66,10 @@ void Monitor(void *arg)
 			//8. average service rate
 			serv_rate[i] = msg_sent[i]/osSleep[i];
 			printf("6. message loss ratio = %f", serv_rate[i]);
+
+			e_pblk = (loss_ratio[i] - pblk_true)/pblk_true;
+			e_arrv = (arrival_ratio[i] - arrv_true)/arrv_true;
+			e_serv = (serv_rate[i] - serv_true)/serv_true;
 		}
 	}
 }
