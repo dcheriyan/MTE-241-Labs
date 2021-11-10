@@ -14,9 +14,6 @@ Getting Value back from void * https://stackoverflow.com/questions/3200294/how-d
 #define NUM_QUEUE 1
 #define MAX_MSGS 10
 
-
-int osSleep;
-
 // global vars
 osMessageQueueId_t qids_a[NUM_QUEUE];	//Makes Message Queues
 
@@ -30,32 +27,13 @@ float num_msg_queue[NUM_QUEUE];
 float loss_ratio[NUM_QUEUE];
 float arrival_ratio[NUM_QUEUE];
 float serv_rate[NUM_QUEUE];
+float osSleep[NUM_QUEUE];
 
 //Monitor
 void Monitor(void *arg)
 {	
 	for(;;){
-		for(int i=0; i < NUM_QUEUE ; i++)
-		{
-			//5. current number of messages in queue
-			num_msg_queue = osMessageQueueGetCount(qids_a[i]);
-			printf("5. queue = %d, %d messages in queue.\n", i, num_msg_queue);
-		}
-		
-		//6. average message loss ratio
-		loss_ratio = overflows/msg_sent;
-		printf("6. message loss ratio = %d", loss_ratio);
-		
-		//7. average message arrival rate
-		arrival_ratio = msg_sent/time_elapsed;
-		printf("6. message loss ratio = %d", arrival_ratio);
-		
-		//8. average service rate
-		serv_rate = msg_sent/osSleep;
-		printf("6. message loss ratio = %d", arrival_ratio);
-{
-	while(true)
-	{
+
 		float arrv_true = 9;
 		float serv_true = 10;
 		float rho =  arrv_true/serv_true;
@@ -68,6 +46,24 @@ void Monitor(void *arg)
 		osDelay(osKernelGetTickFreq());
 		time_elapsed++;
 
+		for(int i=0; i < NUM_QUEUE ; i++)
+		{
+			//5. current number of messages in queue
+			num_msg_queue[i] = osMessageQueueGetCount(qids_a[i]);
+			printf("5. queue = %d, %f messages in queue.\n", i, num_msg_queue[i]);
+			
+			//6. average message loss ratio
+			loss_ratio[i] = overflows[i]/msg_sent[i];
+			printf("6. message loss ratio = %f", loss_ratio[i]);
+			
+			//7. average message arrival rate
+			arrival_ratio[i] = msg_sent[i]/time_elapsed;
+			printf("6. message loss ratio = %f", arrival_ratio[i]);
+			
+			//8. average service rate
+			serv_rate[i] = msg_sent[i]/osSleep[i];
+			printf("6. message loss ratio = %f", serv_rate[i]);
+		}
 	}
 }
 
@@ -79,7 +75,10 @@ void server(void *arg)
 		//recast back to an int
 		int qid_index = *( (int* )  arg);
 		
-		osSleep += (next_event())/(osKernelGetTickFreq()*10*(2^16));
+		for(int i=0; i < NUM_QUEUE ; i++) 
+		{
+			osSleep[i] += (next_event())/(osKernelGetTickFreq()*10*(2^16));
+		}
 		
 		osDelay((next_event())/(osKernelGetTickFreq()*10*(2^16)));
 		
@@ -98,7 +97,10 @@ void client(void *arg) {
 		//recast back to an int
 		int qid_index = *( (int* )  arg);
 		
-		osSleep += (next_event())/(osKernelGetTickFreq()*9*(2^16));
+		for(int i=0; i < NUM_QUEUE ; i++)
+		{
+			osSleep[i] += (next_event())/(osKernelGetTickFreq()*9*(2^16));
+		}
 		
 		osDelay((next_event())/(osKernelGetTickFreq()*9*(2^16)));
 		//Send The message
@@ -121,8 +123,6 @@ void client(void *arg) {
 			}
 		}
 		msg_sent[qid_index]++;
-			
-
 	}
 }
 
