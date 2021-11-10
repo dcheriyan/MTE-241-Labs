@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\SIM\lab4_Daniel.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\SIM\lab4_Daniel.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Wed Nov 10 02:49:29 2021
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Wed Nov 10 04:49:15 2021
 <BR><P>
 <H3>Maximum Stack Usage =        104 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -376,7 +376,6 @@ Global Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[45]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;server
 <LI><a href="#[44]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;client
-<LI><a href="#[46]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Monitor
 </UL>
 
 <P><STRONG><a name="[94]"></a>__aeabi_fmul</STRONG> (Thumb, 100 bytes, Stack size 8 bytes, fmul.o(.text))
@@ -406,7 +405,7 @@ Global Symbols
 <LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;powf
 </UL>
 
-<P><STRONG><a name="[99]"></a>__aeabi_f2d</STRONG> (Thumb, 38 bytes, Stack size 0 bytes, f2d.o(.text))
+<P><STRONG><a name="[97]"></a>__aeabi_f2d</STRONG> (Thumb, 38 bytes, Stack size 0 bytes, f2d.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[46]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Monitor
 </UL>
 
@@ -562,14 +561,14 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[33]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;svcRtxKernelStart
 </UL>
 
-<P><STRONG><a name="[97]"></a>osDelay</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, rtx_delay.o(.text.osDelay))
+<P><STRONG><a name="[99]"></a>osDelay</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, rtx_delay.o(.text.osDelay))
 <BR><BR>[Called By]<UL><LI><a href="#[45]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;server
 <LI><a href="#[44]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;client
 <LI><a href="#[47]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;app_main
 <LI><a href="#[46]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Monitor
 </UL>
 
-<P><STRONG><a name="[96]"></a>osKernelGetTickFreq</STRONG> (Thumb, 40 bytes, Stack size 0 bytes, rtx_kernel.o(.text.osKernelGetTickFreq))
+<P><STRONG><a name="[98]"></a>osKernelGetTickFreq</STRONG> (Thumb, 40 bytes, Stack size 0 bytes, rtx_kernel.o(.text.osKernelGetTickFreq))
 <BR><BR>[Called By]<UL><LI><a href="#[45]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;server
 <LI><a href="#[44]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;client
 <LI><a href="#[46]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Monitor
@@ -598,7 +597,7 @@ Global Symbols
 <LI><a href="#[39]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osRtxTimerThread
 </UL>
 
-<P><STRONG><a name="[98]"></a>osMessageQueueGetCount</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, rtx_msgqueue.o(.text.osMessageQueueGetCount))
+<P><STRONG><a name="[96]"></a>osMessageQueueGetCount</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, rtx_msgqueue.o(.text.osMessageQueueGetCount))
 <BR><BR>[Called By]<UL><LI><a href="#[46]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Monitor
 </UL>
 
@@ -891,19 +890,18 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTInit
 </UL>
 
-<P><STRONG><a name="[46]"></a>Monitor</STRONG> (Thumb, 304 bytes, Stack size 0 bytes, main_daniel.o(i.Monitor))
+<P><STRONG><a name="[46]"></a>Monitor</STRONG> (Thumb, 418 bytes, Stack size 0 bytes, main_daniel.o(i.Monitor))
 <BR><BR>[Stack]<UL><LI>Max Depth = 68<LI>Call Chain = Monitor &rArr; powf &rArr; __aeabi_fsub &rArr; __aeabi_fadd &rArr; _float_epilogue
 </UL>
-<BR>[Calls]<UL><LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osMessageQueueGetCount
-<LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osKernelGetTickFreq
-<LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
-<LI><a href="#[57]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ui2f
+<BR>[Calls]<UL><LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osMessageQueueGetCount
+<LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osKernelGetTickFreq
+<LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
 <LI><a href="#[59]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2f
 <LI><a href="#[55]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fsub
 <LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_frsub
 <LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fmul
 <LI><a href="#[58]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fdiv
-<LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
+<LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
 <LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;powf
 <LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
@@ -1010,17 +1008,17 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osThreadNew
 <LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osMessageQueueNew
-<LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
+<LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
 <LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> main_daniel.o(i.main)
 </UL>
-<P><STRONG><a name="[44]"></a>client</STRONG> (Thumb, 188 bytes, Stack size 32 bytes, main_daniel.o(i.client))
+<P><STRONG><a name="[44]"></a>client</STRONG> (Thumb, 176 bytes, Stack size 32 bytes, main_daniel.o(i.client))
 <BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = client &rArr; osMessageQueuePut &rArr; osRtxPostProcess
 </UL>
 <BR>[Calls]<UL><LI><a href="#[6b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osMessageQueuePut
-<LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osKernelGetTickFreq
-<LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
+<LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osKernelGetTickFreq
+<LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
 <LI><a href="#[57]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ui2f
 <LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fadd
 <LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;next_event
@@ -1104,14 +1102,14 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[43]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fputc
 </UL>
 
-<P><STRONG><a name="[45]"></a>server</STRONG> (Thumb, 156 bytes, Stack size 8 bytes, main_daniel.o(i.server))
+<P><STRONG><a name="[45]"></a>server</STRONG> (Thumb, 150 bytes, Stack size 8 bytes, main_daniel.o(i.server))
 <BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = server &rArr; osMessageQueueGet &rArr; osRtxPostProcess
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osThreadSetPriority
 <LI><a href="#[b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osThreadGetId
 <LI><a href="#[67]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osMessageQueueGet
-<LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osKernelGetTickFreq
-<LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
+<LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osKernelGetTickFreq
+<LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
 <LI><a href="#[57]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ui2f
 <LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fadd
 <LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;next_event

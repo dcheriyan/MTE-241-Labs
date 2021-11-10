@@ -3,6 +3,14 @@ Reference:
 Getting Value back from void * https://stackoverflow.com/questions/3200294/how-do-i-convert-from-void-back-to-int-in-c/3200312#3200312
 */
 
+/* Todo
+	- Fix time elapsed
+	- Fix avg msg loss ratio
+	- Fix msg arrival rate
+	- Fix avg service rate
+	- Test on hardware
+*/
+
 #include <cmsis_os2.h>
 #include <LPC17xx.h>
 #include <stdbool.h>
@@ -20,14 +28,17 @@ osMessageQueueId_t qids_a[NUM_QUEUE];	//Makes Message Queues
 int qid_index[NUM_QUEUE];	//Keep track of actual Qid index value
 
 int time_elapsed = 0;
-float msg_sent[NUM_QUEUE];
-float msg_received[NUM_QUEUE];
-float overflows[NUM_QUEUE];
-float num_msg_queue[NUM_QUEUE];
+int msg_sent[NUM_QUEUE];
+int msg_received[NUM_QUEUE];
+int overflows[NUM_QUEUE];
+int num_msg_queue[NUM_QUEUE];
 float loss_ratio[NUM_QUEUE];
 float arrival_ratio[NUM_QUEUE];
 float serv_rate[NUM_QUEUE];
 float osSleep[NUM_QUEUE];
+float e_pblk[NUM_QUEUE];
+float e_arrv[NUM_QUEUE];
+float e_serv[NUM_QUEUE];	
 
 //Monitor
 void Monitor(void *arg)
@@ -39,31 +50,50 @@ void Monitor(void *arg)
 		float rho =  arrv_true/serv_true;
 		float pblk_true = powf(rho,(1+ MAX_MSGS))*(1-rho)/(1- powf(rho,(2+ MAX_MSGS)));
 		
-		if (time_elapsed%20 == 0)
-		{
-			printf("titels /n");//print titles
-		}
-		osDelay(osKernelGetTickFreq());
+		//if (time_elapsed%20 == 0)
+		//{
+			printf("Qid, Time, Sent, Recv, Over, Wait,   P_blk,    Arrv,    Serv,   Epblk,   Earrv,   Eserv\n");//print titles
+		//}
 		time_elapsed++;
 
-		for(int i=0; i < NUM_QUEUE ; i++)
+		for(int i=0; i < NUM_QUEUE + 1; i++)
 		{
+			//0. print Queue number
+			printf("Q%d   ", i);
+			
+			//1. print time elapsed
+			printf("%4d,", time_elapsed);
+			
+			//2. print total messages sent
+			printf("%5d,", msg_sent[i]);
+			
+			//3. print total messages received
+			printf("%5d,", msg_received[i]);
+			
+			//4. total overflows
+			printf("%5d,", overflows[i]);
+			
 			//5. current number of messages in queue
 			num_msg_queue[i] = osMessageQueueGetCount(qids_a[i]);
-			printf("5. queue = %d, %f messages in queue.\n", i, num_msg_queue[i]);
+			printf("%5d,", num_msg_queue[i]);
 			
 			//6. average message loss ratio
 			loss_ratio[i] = overflows[i]/msg_sent[i];
-			printf("6. message loss ratio = %f", loss_ratio[i]);
+			printf("  %.4f,", loss_ratio[i]);
 			
 			//7. average message arrival rate
 			arrival_ratio[i] = msg_sent[i]/time_elapsed;
-			printf("6. message loss ratio = %f", arrival_ratio[i]);
+			printf(" %.4f,", arrival_ratio[i]);
 			
 			//8. average service rate
 			serv_rate[i] = msg_sent[i]/osSleep[i];
-			printf("6. message loss ratio = %f", serv_rate[i]);
+			printf(" %.4f,\n", serv_rate[i]);
+			
+			e_pblk[i]= (loss_ratio[i] - pblk_true)/pblk_true;
+			e_arrv[i] = (arrival_ratio[i] - arrv_true)/arrv_true;
+			e_serv[i] = (serv_rate[i] - serv_true)/serv_true;
 		}
+		osDelay(osKernelGetTickFreq());
 	}
 }
 
