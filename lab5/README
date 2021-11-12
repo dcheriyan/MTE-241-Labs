@@ -8,7 +8,6 @@ You should put your solution in the general.c file.
 
 The following files should not be modified.
 * final.c
-* fina.h
 * general.h
 
 The rest of files usually do not require modification though if you wish you are allowed to modify them with caution. 
