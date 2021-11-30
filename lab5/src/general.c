@@ -14,23 +14,28 @@
 
 // add global variables here
 uint8_t num_gen; //number of generals
-uint8_t num_trait;
-uint8_t rep_id;
+uint8_t num_trait; //total number of traitors
+uint8_t rep_id;	//reporter id
 bool trait_ids[] = {true, true, true, true, true, true, true}; //all true intially, if false means it's a traitor
 
-char order[8];
-char order_to[8];
-char order_te[8];
-uint8_t comm_id;
-uint8_t limit_count;
+char order[8];			//buffer for order if loyal commander
+char order_to[8];		//buffer order traitor commander sends to odds
+char order_te[8];		//buffer for orrder traitor commander sends to evens
+uint8_t comm_id;		//commander id
+uint8_t limit_count;	//track the limit (how many times we've received messages)
 
 //Message Queues
 osMessageQueueId_t msg_q[7];	//Makes Message Queues
 
 //semaphores
-osSemaphoreId_t broad_sem;
-osSemaphoreId_t stall_sem;
-osSemaphoreId_t done_sem;
+osSemaphoreId_t broad_sem;	//signal to start broadcasting
+osSemaphoreId_t stall_sem;	//makes sure a general doesn't accidently go twice
+osSemaphoreId_t done_sem;	//signal done broadcasting
+
+//Barrier Stuff
+uint8_t barr_count=0;
+osSemaphoreId_t turnstile1;
+osSemaphoreId_t turnstile2;
 
 
 /** Record parameters and set up any OS and other resources
@@ -59,17 +64,21 @@ bool setup(uint8_t nGeneral, bool loyal[], uint8_t reporter) {
 	//n and m are not very descriptive name and this barely uses any stack memory
 	num_gen = n;
 	num_trait = m;
-	
+	//initialize limit to 1 to work properly with stopping condition
 	limit_count = 1;
 	
 	//any sempahores / mutexes
 	stall_sem = osSemaphoreNew(1, 0, NULL);
 	broad_sem = osSemaphoreNew(1, 0, NULL);
 	done_sem= osSemaphoreNew(1, 0, NULL);
+	
+	//Barrier Stuff
+	turnstile1 = osSemaphoreNew(7, 0, NULL);
+	turnstile2= osSemaphoreNew(7, 1, NULL);
 
 	//create message queues?	
 	for(uint8_t i=0; i< num_gen; i++){
-		msg_q[i] = osMessageQueueNew(10, 8*sizeof(char), NULL); //Set message queue array
+		msg_q[i] = osMessageQueueNew(30, 8*sizeof(char), NULL); //Set message queue array
 	}
 
 	//return assert comparing n and m
@@ -85,6 +94,9 @@ void cleanup(void) {
 	osSemaphoreDelete(stall_sem);
 	osSemaphoreDelete(broad_sem);
 	osSemaphoreDelete(done_sem);
+	
+	osSemaphoreDelete(turnstile1);
+	osSemaphoreDelete(turnstile2);
 	
 	for(uint8_t i=0; i< num_gen; i++){
 		osMessageQueueDelete(msg_q[i]); //Delete message queues 
@@ -114,13 +126,37 @@ void broadcast(char command, uint8_t commander) {
 	sprintf(order_te, "%d:%c", comm_id, 'R');
 	sprintf(order_to, "%d:%c", comm_id, 'A');
 
-	//Commander signal broadcast semaphore
+	//Signal Broadcast Semaphore to start
 	osSemaphoreRelease(broad_sem);
-	//Commander Gets Reposnse
+	//All Commanders are done and Reposnse has been printed
 	osSemaphoreAcquire(done_sem, osWaitForever);
-	//return response
 }
 
+
+//reuseable barrier
+void reuse_barr(){
+ 
+	barr_count++ ;
+	if (barr_count == (num_gen - 1)){
+		osSemaphoreAcquire(turnstile2, osWaitForever);
+		osSemaphoreRelease(turnstile1);
+	}
+
+ 
+	osSemaphoreAcquire(turnstile1, osWaitForever);
+	osSemaphoreRelease(turnstile1);
+ 
+
+	barr_count-- ;
+	if (barr_count==0){ 
+		osSemaphoreAcquire(turnstile1, osWaitForever); 
+		osSemaphoreRelease(turnstile2);
+	}
+ 
+	osSemaphoreAcquire(turnstile2, osWaitForever);
+	osSemaphoreRelease(turnstile2);
+	
+}
 
 
 
@@ -144,62 +180,67 @@ void O_M(uint8_t m, char* msg, uint8_t current_gen){
 			}	
 		}
 
-	/*	
-		if(current_gen == 1){
-			printf("msg is %s \n", new_msg);
-		}
-		*/
-		//Send message to others
+			
+		reuse_barr();
+
 		for(uint8_t i=0; i < num_gen; i++){
 			char id_num [2];
 			sprintf(id_num, "%d", i);
 			if ( (i!= current_gen) && (strstr(new_msg,id_num) == NULL) ){	//Send if hasn't already received
+				//printf("sending to %s \n", id_num);
 				osMessageQueuePut(msg_q[i], (void*)&new_msg, 0, 0); 
 			}
 		}
 		
+		reuse_barr();
+
 		//Receive Messages
 		char recv_msg[8];
+
 		uint8_t limit;
 		if (m == num_trait){
-			limit = (num_gen-2-(num_trait-m));
+			limit = (num_gen-2);
 		}
-		else {
-			limit = (num_gen-2-(num_trait-m))*(num_gen-2-(num_trait-m));
+		else { //will only happen for case m=1 num trait =2
+			limit = (num_gen-3)*(num_gen-2);
 		}
 		
-		for(uint8_t i = 0; i < limit; i++) {			//receive the amount of messages we expect to receive
-			
-			osMessageQueueGet(msg_q[current_gen], (void*)&recv_msg, NULL, osWaitForever);
-			
-			O_M((m-1),recv_msg, current_gen);
+		char recv_buffer[limit][8];
+		
+		for(uint8_t i = 0; i < limit; i++) {			//receive all the messages currently in the queue			
+			osMessageQueueGet(msg_q[current_gen], (void*)&recv_msg, NULL, 0);
+			strcpy(recv_buffer[i], recv_msg);			
 		}
+		
+	//	reuse_barr(); //sync up
+
+		if(current_gen == 6){
+			for(uint8_t k = 0; k < limit; k++) {			//check values stored in buffer
+				 printf("For Gen6, m is %d, msg recv %d, is %s \n", m, k, recv_buffer[k]); 
+			}
+		}
+
+		for(uint8_t j = 0; j < limit; j++) {			//apply algorithm for all messages in the buffer
+			O_M((m-1),recv_buffer[j], current_gen); //Apply O_M algortihm to 
+		}
+
+		
 	}
 	else {
 		if(current_gen == rep_id){
-			//print (based on relationship between m and n)
-
-
 			limit_count++;
 			
-			//char print_msg[8];
-			
 			uint8_t limit;
-			
 			if (2 == num_trait){
 				limit = (num_gen-2)*(num_gen-3);
 			}
 			else {
 				limit = (num_gen-2);
 			}
-			
-			
-//			for(uint8_t i = 0; i < limit; i++) {			//receive the amount of messages we expect to receive
-//			osMessageQueueGet(msg_q[current_gen], (void*)&print_msg, NULL, osWaitForever);
 
 			printf("%s \n", msg);
 				
-			if (limit_count == limit){	
+			if (!(limit_count < limit)){	
 				osDelay(osKernelGetTickFreq()/200); //small delay to make sure we can print the message
 				osSemaphoreRelease(done_sem);
 			}
