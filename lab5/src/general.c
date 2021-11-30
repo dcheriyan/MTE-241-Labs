@@ -187,7 +187,6 @@ void O_M(uint8_t m, char* msg, uint8_t current_gen){
 			char id_num [2];
 			sprintf(id_num, "%d", i);
 			if ( (i!= current_gen) && (strstr(new_msg,id_num) == NULL) ){	//Send if hasn't already received
-				//printf("sending to %s \n", id_num);
 				osMessageQueuePut(msg_q[i], (void*)&new_msg, 0, 0); 
 			}
 		}
@@ -202,23 +201,17 @@ void O_M(uint8_t m, char* msg, uint8_t current_gen){
 			limit = (num_gen-2);
 		}
 		else { //will only happen for case m=1 num trait =2
-			limit = (num_gen-3)*(num_gen-2);
+			limit = (num_gen-3);
 		}
 		
 		char recv_buffer[limit][8];
 		
 		for(uint8_t i = 0; i < limit; i++) {			//receive all the messages currently in the queue			
-			osMessageQueueGet(msg_q[current_gen], (void*)&recv_msg, NULL, 0);
-			strcpy(recv_buffer[i], recv_msg);			
+			osMessageQueueGet(msg_q[current_gen], (void*)&recv_msg, NULL, osKernelGetTickFreq()/500);
+			strcpy(recv_buffer[i], recv_msg);
 		}
 		
-	//	reuse_barr(); //sync up
-
-		if(current_gen == 6){
-			for(uint8_t k = 0; k < limit; k++) {			//check values stored in buffer
-				 printf("For Gen6, m is %d, msg recv %d, is %s \n", m, k, recv_buffer[k]); 
-			}
-		}
+		reuse_barr(); //sync up
 
 		for(uint8_t j = 0; j < limit; j++) {			//apply algorithm for all messages in the buffer
 			O_M((m-1),recv_buffer[j], current_gen); //Apply O_M algortihm to 
@@ -279,6 +272,5 @@ void general(void *idPtr) {
 			}
 		}
 	osSemaphoreAcquire(stall_sem, osWaitForever);
-		//signal done if last one
 	}
 }
