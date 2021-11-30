@@ -1,15 +1,27 @@
 AE241-L5 start
 
 AE241-L5 test case 0 start
+src\general.c,76: assertion 'n > 3*m' failed
+setup failed
 AE241-L5 test case 0 end
 
 AE241-L5 test case 1 start
+1:0:A 
+3:0:R 
 AE241-L5 test case 1 end
 
 AE241-L5 test case 2 start
+0:1:R 
+3:1:A 
 AE241-L5 test case 2 end
 
 AE241-L5 test case 3 start
-AE241-L5 test case 3 end
-
-AE241-L5 done
+2:0:R 
+2:1:0:A 
+3:0:R 
+3:1:0:A 
+4:0:R 
+4:1:0:R 
+5:0:R 
+5:1:0:A 
+1:2:0:A 
