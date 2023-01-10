@@ -1,3 +1,10 @@
+Lab 5
+The goal of this lab was to peform a partial implementation of the Byzantine Generals problem. More information about the problem can be found here: https://lamport.azurewebsites.net/pubs/byz.pdf 
+Specifically in the lab I designed an the implementation that determined the order each lieutenant would receive given which nodes were loyal and traitors (they would not try to determine the actual course of action).
+Personally in this lab, I got a chance to apply what I learned about semaphores and reusable barriers, and I got experience communicating between different threads with message queues in a more complicated scenario.
+__________________________________________________________________________
+*Actual Notes from Template Files
+
 This is the MTE241 Lab5 starter project. It contains SIM And RAM targets.
 
 You need to complete two files and they are README_Target.csv and general.c.
